@@ -1856,7 +1856,7 @@ CLASS lcl_ole  IMPLEMENTATION .
       temp_directory_set( ) .
       IF v_temp_directory IS INITIAL .
         MESSAGE i000(lp) WITH v_text-t050 . " text: The working directory is not determined
-        EXIT .
+        RETURN.
       ENDIF .
       temp_directory_clear( ) .
     ENDIF .
@@ -6395,7 +6395,8 @@ CLASS lcl_excelruntime IMPLEMENTATION .
             IF lr_node-r IS INITIAL. EXIT. ENDIF .
             IF lv_index GT 0 .
               lr_node-r->remove_node( ) .
-              CHECK 1 = 2 .
+*              CHECK 1 = 2 .
+              EXIT . " -->> from DO
             ENDIF .
             lr_element-r ?= lr_node-r->query_interface( ixml_iid_element ) .
             FREE lr_element-any . CLEAR lr_element-any .
@@ -6751,7 +6752,8 @@ CLASS lcl_excelruntime IMPLEMENTATION .
                     IF lr_node-r IS INITIAL. EXIT. ENDIF .
                     IF lv_index GT 0 .
                       lr_node-r->remove_node( ) .
-                      CHECK 1 = 2 .
+*                      CHECK 1 = 2 .
+                      EXIT . " -->> from DO
                     ENDIF .
                     lr_element-r ?= lr_node-r->query_interface( ixml_iid_element ) .
                     FREE lr_element-any . CLEAR lr_element-any .
@@ -8996,9 +8998,17 @@ CLASS lcl_excelruntime IMPLEMENTATION .
 
       ELSE .
         lv_date_ext = iv_value .
-        CALL 'DATE_CONV_EXT_TO_INT'
-          ID 'DATINT' FIELD lv_date_sap
-          ID 'DATEXT' FIELD lv_date_ext .
+        CALL FUNCTION 'CONVERT_DATE_TO_INTERNAL'
+          EXPORTING
+            date_external            = lv_date_ext
+          IMPORTING
+            DATE_INTERNAL            = lv_date_sap
+          EXCEPTIONS
+            DATE_EXTERNAL_IS_INVALID = 1
+             OTHERS                  = 2.
+*        CALL 'DATE_CONV_EXT_TO_INT'
+*          ID 'DATINT' FIELD lv_date_sap
+*          ID 'DATEXT' FIELD lv_date_ext .
         IF sy-subrc    NE 0
         OR lv_date_sap IS INITIAL .
           EXIT . " -->> from DO
@@ -13347,7 +13357,7 @@ CLASS lcl_form IMPLEMENTATION .
                   v_text-t020  INTO v_dummy . " text: Context binding is incorrect
           msg_syst_catch2( CHANGING ct_retmess = cs_data-exceptions-t_retmess ) .
           cs_data-exceptions-cb_val_relpath = c_retcode-error .
-          EXIT .
+          RETURN.
         ENDIF .
     ENDCASE .
 
@@ -13405,7 +13415,7 @@ CLASS lcl_form IMPLEMENTATION .
               msg_syst_catch2( CHANGING ct_retmess = cs_data-exceptions-t_retmess ) .
               cs_data-exceptions-cb_relpath = c_retcode-legacy .
 
-              EXIT .
+              RETURN.
           ENDCASE .
         ELSE .
           EXIT .
@@ -13944,7 +13954,7 @@ CLASS lcl_form IMPLEMENTATION .
         CLEAR: cs_data-properties-cb_val_convert .
       WHEN c_comp_type-chart .
         CLEAR: cs_data-properties-cb_val_convert .
-        EXIT .
+        RETURN.
       WHEN OTHERS .
         CLEAR: cs_data-properties-tb_drwstat_flag ,
                cs_data-properties-tb_drwstat_name ,
@@ -22648,8 +22658,8 @@ CLASS lcl_wb_protab DEFINITION INHERITING FROM lcl_root .
         formdescr_name      TYPE tv_nodekey VALUE 'FORMDESCR_NM' ,
         format              TYPE tv_nodekey VALUE 'FORMAT' ,
         format_line1        TYPE tv_nodekey VALUE 'FORMAT_LINE1' ,
-        postprocessing      TYPE tv_nodekey VALUE 'POSTPROCESSING' ,
-        postproc_line1      TYPE tv_nodekey VALUE 'POSTPROC_LINE1' ,
+        postprocessing      TYPE tv_nodekey VALUE 'POSTPROCESSI' ,"NG' ,
+        postproc_line1      TYPE tv_nodekey VALUE 'POSTPROC_LIN' ,"E1' ,
         techinfo            TYPE tv_nodekey VALUE 'TECHINFO' ,
         created             TYPE tv_nodekey VALUE 'CREATED' ,
         changed             TYPE tv_nodekey VALUE 'CHANGED' ,
@@ -22710,8 +22720,8 @@ CLASS lcl_wb_protab DEFINITION INHERITING FROM lcl_root .
         chart_layout        TYPE tv_nodekey VALUE 'CHARTLAYOUT' ,
         chart_model         TYPE tv_nodekey VALUE 'CHART_MDL' ,
         chart_title         TYPE tv_nodekey VALUE 'CHART_TITLE' ,
-        chart_title_catax   TYPE tv_nodekey VALUE 'CHART_TLCATAX' ,
-        chart_title_valax   TYPE tv_nodekey VALUE 'CHART_TLVALAX' ,
+        chart_title_catax   TYPE tv_nodekey VALUE 'CHART_TLCATA' ,"X' ,
+        chart_title_valax   TYPE tv_nodekey VALUE 'CHART_TLVALA' ,"X' ,
         chart_title_ser     TYPE tv_nodekey VALUE 'CHART_TLSER' ,
         chart_dtset         TYPE tv_nodekey VALUE 'CHART_DTS' ,
         chart_dtset_1       TYPE tv_nodekey VALUE 'CHART_DTS_1' ,
@@ -28668,7 +28678,7 @@ CLASS lcl_workbench IMPLEMENTATION .
     IF sy-subrc NE 0 .
       MESSAGE ID sy-msgid TYPE 'I' NUMBER sy-msgno
               WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4 .
-      EXIT .
+      RETURN.
     ENDIF .
 
     r_cont_4formtree = r_cont_splitter2->get_container( row = 1   column = 1 ) .
@@ -28683,7 +28693,7 @@ CLASS lcl_workbench IMPLEMENTATION .
     IF sy-subrc NE 0 .
       MESSAGE ID sy-msgid TYPE 'I' NUMBER sy-msgno
               WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4 .
-      EXIT .
+      RETURN.
     ENDIF .
     SET HANDLER hndl_fcode_appl FOR r_appltoolbar .
   ENDMETHOD .                    "init_appltoolbar
@@ -28701,7 +28711,7 @@ CLASS lcl_workbench IMPLEMENTATION .
     IF sy-subrc NE 0 .
       MESSAGE ID sy-msgid TYPE 'I' NUMBER sy-msgno
               WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4 .
-      EXIT .
+      RETURN.
     ENDIF .
 
     SET HANDLER hndl_fcode_tmpl FOR r_excelole .
@@ -28723,7 +28733,7 @@ CLASS lcl_workbench IMPLEMENTATION .
     IF sy-subrc NE 0 .
       MESSAGE ID sy-msgid TYPE 'I' NUMBER sy-msgno
               WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4 .
-      EXIT .
+      RETURN.
     ENDIF .
 
     SET HANDLER hndl_fcode_comp FOR r_formtree .
@@ -28738,7 +28748,7 @@ CLASS lcl_workbench IMPLEMENTATION .
     IF sy-subrc NE 0 .
       MESSAGE ID sy-msgid TYPE 'I' NUMBER sy-msgno
               WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4 .
-      EXIT .
+      RETURN.
     ENDIF .
 
     SET HANDLER hndl_fcode_ptab FOR r_protab .
@@ -30776,7 +30786,8 @@ CLASS lcl_workbench IMPLEMENTATION .
           t_outtab              = lt_outtab_dtsfld[].
       IF lv_exit_dtsfld IS NOT INITIAL .
         MESSAGE s000(lp) WITH v_text-t100 .	"	text: Operation was terminated by the user
-        CHECK 1 = 2 .
+*        CHECK 1 = 2 .
+        EXIT . " -->> from DO
       ENDIF .
 
       CHECK ls_selfield-tabindex NE 0 .
@@ -35774,7 +35785,7 @@ CLASS lcl_viewer IMPLEMENTATION .
     DATA:
       lr_send_request     TYPE REF TO cl_bcs ,
       lr_mail_message     TYPE REF TO cl_document_bcs ,
-      lv_attachment_type  TYPE soodk-objtp VALUE 'XLSX' .
+      lv_attachment_type  TYPE soodk-objtp VALUE 'XLS'. "X' . "Увы, там только 3 символа
 
     r_excelole->r_docproxy->save_document_to_table(
       CHANGING

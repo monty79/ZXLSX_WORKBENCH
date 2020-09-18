@@ -6,9 +6,16 @@
     <NAME>ZXLWB_INCLUDE</NAME>
     <SUBC>I</SUBC>
     <APPL>S</APPL>
-    <RLOAD>E</RLOAD>
+    <RLOAD>R</RLOAD>
     <UCCHECK>X</UCCHECK>
    </PROGDIR>
+   <TPOOL>
+    <item>
+     <ID>R</ID>
+     <ENTRY>Core</ENTRY>
+     <LENGTH>4</LENGTH>
+    </item>
+   </TPOOL>
   </asx:values>
  </asx:abap>
 </abapGit>
