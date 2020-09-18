@@ -1,2 +1,3 @@
 # ZXLSX_WORKBENCH
-XLSX Workbench
+Repository for ABAP XLSX Workbench by Igor Borodin
+See https://sites.google.com/site/sapxlwb/home
